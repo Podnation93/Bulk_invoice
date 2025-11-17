@@ -108,7 +108,12 @@ ipcMain.handle('process-pdfs', async (_event, filePaths: string[]) => {
     });
   } finally {
     // Always terminate OCR worker to prevent memory leaks
-    await ocrEngine.terminate();
+    try {
+      await ocrEngine.terminate();
+    } catch (terminateError) {
+      // Log but don't throw - termination errors shouldn't affect result
+      console.error('Failed to terminate OCR engine:', terminateError);
+    }
   }
 
   return {
@@ -144,7 +149,8 @@ ipcMain.handle('export-csv', async (_event, rows: XeroCSVRow[]) => {
   });
 
   if (!result.canceled && result.filePath) {
-    const validationResult = invoiceValidator.validateInvoices([]);
+    // Validate the actual CSV rows being exported
+    const validationResult = templateFormatter.validateCSVRows(rows);
     return exportModule.exportWithLog(
       rows,
       { outputPath: result.filePath },

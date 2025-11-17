@@ -141,12 +141,14 @@ export class OCREngine {
    * Clean up temporary OCR files
    */
   private cleanupTempFiles(tempDir: string): void {
-    if (fs.existsSync(tempDir)) {
-      const files = fs.readdirSync(tempDir);
-      for (const file of files) {
-        fs.unlinkSync(path.join(tempDir, file));
+    try {
+      if (fs.existsSync(tempDir)) {
+        // Use recursive removal to handle subdirectories properly
+        fs.rmSync(tempDir, { recursive: true, force: true });
       }
-      fs.rmdirSync(tempDir);
+    } catch (error) {
+      // Log but don't throw - cleanup errors shouldn't stop processing
+      console.error('Failed to clean up OCR temp files:', error);
     }
   }
 

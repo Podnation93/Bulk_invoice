@@ -132,16 +132,33 @@ export class ExportModule {
     rowCount: number,
     validationResult: ValidationResult
   ): void {
-    const uniqueInvoices = new Set(
-      // We need to count unique invoices somehow
-      // This is a simplified version
-    );
+    // Count unique invoices from validation errors/warnings that have invoice numbers
+    const uniqueInvoices = new Set<string>();
+
+    // Extract unique invoice numbers from validation results
+    for (const error of validationResult.errors) {
+      if (error.invoiceNumber) {
+        uniqueInvoices.add(error.invoiceNumber);
+      }
+    }
+    for (const warning of validationResult.warnings) {
+      if (warning.invoiceNumber) {
+        uniqueInvoices.add(warning.invoiceNumber);
+      }
+    }
+
+    // Estimate invoice count from row count (typically multiple rows per invoice)
+    // If no specific invoice numbers found, estimate based on rows
+    const estimatedInvoiceCount = uniqueInvoices.size > 0
+      ? uniqueInvoices.size
+      : Math.ceil(rowCount / 3); // Average ~3 line items per invoice
 
     const logContent = [
       `Export Log - ${new Date().toISOString()}`,
       '═'.repeat(60),
       `CSV File: ${csvPath}`,
       `Total Rows: ${rowCount}`,
+      `Estimated Invoices: ${estimatedInvoiceCount}`,
       '',
       'Validation Summary:',
       `  Valid: ${validationResult.isValid}`,
@@ -173,7 +190,7 @@ export class ExportModule {
       timestamp: new Date(),
       filePath: csvPath,
       rowCount,
-      invoiceCount: 0, // Would need to calculate from rows
+      invoiceCount: estimatedInvoiceCount,
       warnings: validationResult.warnings.map((w) => w.message),
       errors: validationResult.errors.map((e) => e.message),
     });
@@ -207,6 +224,7 @@ export class ExportModule {
    * Validate output path is writable
    */
   static validateOutputPath(outputPath: string): boolean {
+    let testFile: string | null = null;
     try {
       const dir = path.dirname(outputPath);
 
@@ -216,13 +234,23 @@ export class ExportModule {
       }
 
       // Check if we can write
-      const testFile = path.join(dir, '.write_test');
+      testFile = path.join(dir, '.write_test');
       fs.writeFileSync(testFile, '');
-      fs.unlinkSync(testFile);
 
       return true;
     } catch {
       return false;
+    } finally {
+      // Always clean up test file if it was created
+      if (testFile) {
+        try {
+          if (fs.existsSync(testFile)) {
+            fs.unlinkSync(testFile);
+          }
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
     }
   }
 
