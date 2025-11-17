@@ -328,3 +328,4 @@ export class InvoiceValidator {
 }
 
 export default InvoiceValidator;
+export { DuplicateDetector } from './duplicate-detector';
