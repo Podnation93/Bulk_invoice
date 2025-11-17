@@ -44,3 +44,6 @@ temp/
 # PDF processing temporary files
 *.pdf.tmp
 ocr-cache/
+
+# Claude Code local settings
+.claude/
