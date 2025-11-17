@@ -334,3 +334,140 @@ body {
   border: 1px solid #667eea;
   border-radius: 3px;
 }
+
+/* Error Boundary Styles */
+.error-boundary {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.error-boundary-content {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.error-boundary-content h2 {
+  color: #f44336;
+  margin-bottom: 15px;
+}
+
+.error-boundary-content p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.error-details {
+  text-align: left;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.error-details h3 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.error-message {
+  background: #fff3cd;
+  color: #856404;
+  padding: 10px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.error-stack {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 11px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.error-details details {
+  margin-top: 10px;
+}
+
+.error-details summary {
+  cursor: pointer;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.error-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* Duplicate Warning Styles */
+.duplicate-warning {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.duplicate-warning h4 {
+  color: #856404;
+  margin-bottom: 10px;
+}
+
+.duplicate-list {
+  list-style: none;
+  padding: 0;
+}
+
+.duplicate-list li {
+  background: white;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  border-left: 4px solid #ffc107;
+}
+
+.duplicate-list .invoice-info {
+  font-weight: 500;
+  color: #856404;
+}
+
+.duplicate-list .occurrence-count {
+  font-size: 12px;
+  color: #666;
+}
+
+.duplicate-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-warning {
+  background: #ffc107;
+  color: #000;
+  border: none;
+}
+
+.btn-warning:hover {
+  background: #e0a800;
+}
