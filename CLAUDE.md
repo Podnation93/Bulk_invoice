@@ -85,6 +85,43 @@ Bulk PDF Invoice Extraction and CSV Generation tool for Xero Import. Extracts in
     - Patch suggestions for high-confidence fixes
     - Reproducibility estimation
 
+12. **Auto-Fixer Agent** (`src/modules/auto-fixer-agent/`)
+    - Automatically implements bug fixes from Bug Review Agent
+    - Implements feature recommendations from New Features Agent
+    - Code generation based on agent suggestions
+    - Safe patch application with rollback capability
+    - Validates fixes before committing
+
+## Agent Review Workflow
+
+**IMPORTANT**: The New Features Agent and Bug Review Agent run directly within Claude Code to continuously review and improve this project. They are NOT part of the application itself.
+
+### How It Works
+
+1. **Continuous Review**: When working on this codebase, Claude Code should periodically run the agents to:
+   - Detect potential bugs and security issues
+   - Identify feature improvement opportunities
+   - Generate prioritized recommendations
+
+2. **Auto-Fix Workflow**: The Auto-Fixer Agent takes recommendations and:
+   - Automatically implements suggested bug fixes
+   - Builds new features from proposals
+   - Validates and tests changes before committing
+
+3. **Proactive Maintenance**: Always run agents to check for:
+   - Security vulnerabilities (CSV injection, memory leaks, etc.)
+   - Performance optimizations
+   - Code quality improvements
+   - Missing features based on domain analysis
+
+### Running the Agents
+
+When Claude Code is working on this project, it should:
+1. Run New Features Agent analysis to identify improvement opportunities
+2. Run Bug Review Agent to detect potential issues
+3. Use Auto-Fixer Agent to implement high-priority fixes/features
+4. Commit changes with detailed descriptions
+
 ## Commands
 
 ```bash
