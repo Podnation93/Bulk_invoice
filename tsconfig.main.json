@@ -13,13 +13,32 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "dist/main",
-    "rootDir": "src/main",
+    "rootDir": "src",
     "baseUrl": ".",
     "paths": {
       "@modules/*": ["src/modules/*"],
       "@shared/*": ["src/shared/*"]
     }
   },
-  "include": ["src/main/**/*", "src/modules/**/*", "src/shared/**/*"],
-  "exclude": ["node_modules", "dist", "release"]
+  "include": [
+    "src/main/**/*",
+    "src/modules/pdf-processor/**/*",
+    "src/modules/ocr/**/*",
+    "src/modules/parser/**/*",
+    "src/modules/validation/**/*",
+    "src/modules/formatter/**/*",
+    "src/modules/export/**/*",
+    "src/modules/preferences/**/*",
+    "src/modules/cache/**/*",
+    "src/shared/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "release",
+    "src/modules/auto-fixer-agent/**/*",
+    "src/modules/bug-review-agent/**/*",
+    "src/modules/new-features-agent/**/*",
+    "src/modules/ai-assistant/**/*"
+  ]
 }

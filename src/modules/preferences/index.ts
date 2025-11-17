@@ -152,7 +152,7 @@ export class PreferencesManager {
       const validated: UserPreferences = { ...DEFAULT_PREFERENCES };
       for (const key of Object.keys(DEFAULT_PREFERENCES) as Array<keyof UserPreferences>) {
         if (key in imported && typeof imported[key] === typeof DEFAULT_PREFERENCES[key]) {
-          validated[key] = imported[key];
+          (validated as unknown as Record<string, unknown>)[key] = imported[key];
         }
       }
       this.preferences = validated;
