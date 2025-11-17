@@ -90,12 +90,19 @@ export class TemplateFormatter {
 
   /**
    * Sanitize field for CSV (remove problematic characters)
+   * Also prevents CSV injection attacks
    */
   private sanitizeField(value: string): string {
     if (!value) return '';
 
     // Remove leading/trailing whitespace
     let sanitized = value.trim();
+
+    // Prevent CSV injection - prefix dangerous characters with single quote
+    // These characters can trigger formula execution in Excel/Sheets
+    if (/^[=+\-@\t\r]/.test(sanitized)) {
+      sanitized = "'" + sanitized;
+    }
 
     // Replace multiple spaces with single space
     sanitized = sanitized.replace(/\s+/g, ' ');
