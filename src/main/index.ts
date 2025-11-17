@@ -3,7 +3,7 @@ import * as path from 'path';
 import { PDFProcessor } from '../modules/pdf-processor';
 import { OCREngine } from '../modules/ocr';
 import { InvoiceParser } from '../modules/parser';
-import { InvoiceValidator } from '../modules/validation';
+import { InvoiceValidator, DuplicateDetector } from '../modules/validation';
 import { TemplateFormatter } from '../modules/formatter';
 import { ExportModule } from '../modules/export';
 import { ExtractedInvoice, XeroCSVRow } from '../shared/types';
@@ -14,6 +14,7 @@ const pdfProcessor = new PDFProcessor();
 const ocrEngine = new OCREngine();
 const invoiceParser = new InvoiceParser();
 const invoiceValidator = new InvoiceValidator();
+const duplicateDetector = new DuplicateDetector();
 const templateFormatter = new TemplateFormatter();
 const exportModule = new ExportModule();
 
@@ -105,6 +106,9 @@ ipcMain.handle('process-pdfs', async (_event, filePaths: string[]) => {
       file: 'Initialization',
       error: errorMessage,
     });
+  } finally {
+    // Always terminate OCR worker to prevent memory leaks
+    await ocrEngine.terminate();
   }
 
   return {
@@ -115,6 +119,14 @@ ipcMain.handle('process-pdfs', async (_event, filePaths: string[]) => {
 
 ipcMain.handle('validate-invoices', async (_event, invoices: ExtractedInvoice[]) => {
   return invoiceValidator.validateInvoices(invoices);
+});
+
+ipcMain.handle('detect-duplicates', async (_event, invoices: ExtractedInvoice[]) => {
+  return duplicateDetector.detectDuplicates(invoices);
+});
+
+ipcMain.handle('remove-duplicates', async (_event, invoices: ExtractedInvoice[]) => {
+  return duplicateDetector.removeDuplicates(invoices);
 });
 
 ipcMain.handle('format-to-csv-rows', async (_event, invoices: ExtractedInvoice[]) => {
