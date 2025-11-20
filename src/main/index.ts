@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import type { BrowserWindow as BrowserWindowType, App, Dialog, IpcMain } from 'electron';
 import * as path from 'path';
 import { PDFProcessor } from '../modules/pdf-processor';
 import { OCREngine } from '../modules/ocr';
@@ -8,7 +8,18 @@ import { TemplateFormatter } from '../modules/formatter';
 import { ExportModule } from '../modules/export';
 import { ExtractedInvoice, XeroCSVRow } from '../shared/types';
 
-let mainWindow: BrowserWindow | null = null;
+// Use require for electron - it must run in Electron context
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const electron = require('electron') as {
+  app: App;
+  BrowserWindow: typeof BrowserWindowType;
+  ipcMain: IpcMain;
+  dialog: Dialog;
+};
+
+const { app, BrowserWindow, ipcMain, dialog } = electron;
+
+let mainWindow: BrowserWindowType | null = null;
 
 const pdfProcessor = new PDFProcessor();
 const ocrEngine = new OCREngine();
@@ -19,7 +30,7 @@ const templateFormatter = new TemplateFormatter();
 const exportModule = new ExportModule();
 
 function createWindow(): void {
-  mainWindow = new BrowserWindow({
+  const window = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
@@ -29,15 +40,17 @@ function createWindow(): void {
     },
   });
 
+  mainWindow = window;
+
   // Load the React app
   if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:3000');
-    mainWindow.webContents.openDevTools();
+    window.loadURL('http://localhost:3000');
+    window.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+    window.loadFile(path.join(__dirname, '../renderer/index.html'));
   }
 
-  mainWindow.on('closed', () => {
+  window.on('closed', () => {
     mainWindow = null;
   });
 }
@@ -58,7 +71,7 @@ app.on('activate', () => {
 
 // IPC Handlers
 
-ipcMain.handle('select-pdf-files', async () => {
+ipcMain.handle('select-pdf-files', async (_event: unknown) => {
   const result = await dialog.showOpenDialog({
     properties: ['openFile', 'multiSelections'],
     filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
@@ -70,7 +83,7 @@ ipcMain.handle('select-pdf-files', async () => {
   return [];
 });
 
-ipcMain.handle('process-pdfs', async (_event, filePaths: string[]) => {
+ipcMain.handle('process-pdfs', async (_event: unknown, filePaths: string[]) => {
   const extractedInvoices: ExtractedInvoice[] = [];
   const errors: Array<{ file: string; error: string }> = [];
 
@@ -122,27 +135,27 @@ ipcMain.handle('process-pdfs', async (_event, filePaths: string[]) => {
   };
 });
 
-ipcMain.handle('validate-invoices', async (_event, invoices: ExtractedInvoice[]) => {
+ipcMain.handle('validate-invoices', async (_event: unknown, invoices: ExtractedInvoice[]) => {
   return invoiceValidator.validateInvoices(invoices);
 });
 
-ipcMain.handle('detect-duplicates', async (_event, invoices: ExtractedInvoice[]) => {
+ipcMain.handle('detect-duplicates', async (_event: unknown, invoices: ExtractedInvoice[]) => {
   return duplicateDetector.detectDuplicates(invoices);
 });
 
-ipcMain.handle('remove-duplicates', async (_event, invoices: ExtractedInvoice[]) => {
+ipcMain.handle('remove-duplicates', async (_event: unknown, invoices: ExtractedInvoice[]) => {
   return duplicateDetector.removeDuplicates(invoices);
 });
 
-ipcMain.handle('format-to-csv-rows', async (_event, invoices: ExtractedInvoice[]) => {
+ipcMain.handle('format-to-csv-rows', async (_event: unknown, invoices: ExtractedInvoice[]) => {
   return templateFormatter.formatInvoicesToCSVRows(invoices);
 });
 
-ipcMain.handle('preview-csv', async (_event, rows: XeroCSVRow[]) => {
+ipcMain.handle('preview-csv', async (_event: unknown, rows: XeroCSVRow[]) => {
   return templateFormatter.createPreview(rows);
 });
 
-ipcMain.handle('export-csv', async (_event, rows: XeroCSVRow[]) => {
+ipcMain.handle('export-csv', async (_event: unknown, rows: XeroCSVRow[]) => {
   const result = await dialog.showSaveDialog({
     defaultPath: ExportModule.generateFilename(),
     filters: [{ name: 'CSV Files', extensions: ['csv'] }],
